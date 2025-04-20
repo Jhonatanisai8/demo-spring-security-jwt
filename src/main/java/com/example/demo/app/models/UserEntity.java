@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -30,4 +32,16 @@ public class UserEntity {
 
     @NotBlank
     private String passwordUser;
+
+    @ManyToMany(
+            fetch =  FetchType.EAGER,
+            targetEntity = RoleEntity.class,
+            cascade = CascadeType.PERSIST
+    )
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_role")
+    )
+    private Set<RoleEntity> roles;
 }
