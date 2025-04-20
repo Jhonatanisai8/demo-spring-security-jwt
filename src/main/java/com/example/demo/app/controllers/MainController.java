@@ -6,7 +6,7 @@ import com.example.demo.app.models.RoleEntity;
 import com.example.demo.app.models.UserEntity;
 import com.example.demo.app.repositorys.UserRepository;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequiredArgsConstructor
 public class MainController {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping(path = "/hello")
     public String hello() {
@@ -36,8 +36,8 @@ public class MainController {
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping(path = "/deleteUser/{userId}")
-    public String deleteUser(@RequestParam Integer userId) {
+    @DeleteMapping(path = "/deleteUser")
+    public String deleteUser(@RequestParam(name = "id") Integer userId) {
         userRepository.deleteById(userId);
         return "Deleted User " + userId;
     }
