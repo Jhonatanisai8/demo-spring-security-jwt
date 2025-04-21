@@ -1,27 +1,38 @@
 package com.example.demo.app.security;
 
+import com.example.demo.app.security.ffilters.JwtAuthenticationFilter;
+import com.example.demo.app.security.jwt.JwtUtils;
+import com.example.demo.app.services.UserDetailsServiceIpml;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecutiryConfig {
 
+    private final UserDetailsServiceIpml userDetailsService;
+    private final JwtUtils jwtUtils;
+
+
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                            AuthenticationManager authenticationManager) throws Exception {
+
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils);
+        jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
+        jwtAuthenticationFilter.setFilterProcessesUrl("/login");
+
         return httpSecurity
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
                 .authorizeHttpRequests(authorizeRequests -> {
@@ -31,12 +42,12 @@ public class SecutiryConfig {
                 .sessionManagement(sesion -> {
                     sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })
-                .httpBasic(Customizer.withDefaults())
+                .addFilter(jwtAuthenticationFilter)
                 .build();
     }
 
     //detalles de un usuario
-    @Bean
+  /*  @Bean
     UserDetailsService userDetailsService() {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
         manager.createUser(User.withUsername("jhos")
@@ -44,7 +55,8 @@ public class SecutiryConfig {
                 .roles()
                 .build());
         return manager;
-    }
+    }*/
+
 
     //codificacion de la contraseña
     @Bean
@@ -57,10 +69,12 @@ public class SecutiryConfig {
     public AuthenticationManager authenticationManager(
             PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(authenticationProvider);
     }
 
-
+//    public static void main(String[] args) {
+//        System.out.println(new BCryptPasswordEncoder().encode("korgpa50"));
+//    }
 }

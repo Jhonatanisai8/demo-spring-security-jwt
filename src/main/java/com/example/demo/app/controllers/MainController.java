@@ -6,7 +6,7 @@ import com.example.demo.app.models.RoleEntity;
 import com.example.demo.app.models.UserEntity;
 import com.example.demo.app.repositorys.UserRepository;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +15,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class MainController {
 
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
-
-    public MainController(PasswordEncoder passwordEncoder, UserRepository userRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-    }
 
     @GetMapping(path = "/hello")
     public String hello() {

@@ -2,6 +2,7 @@ package com.example.demo.app.services;
 
 import com.example.demo.app.models.UserEntity;
 import com.example.demo.app.repositorys.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,18 +15,16 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceIpml
         implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public UserDetailsServiceIpml(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByUsername(username)
+        UserEntity userEntity = userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username ".concat(username).concat(" no exist")));
 
 
