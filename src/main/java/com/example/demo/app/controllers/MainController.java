@@ -8,6 +8,7 @@ import com.example.demo.app.repositorys.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -16,8 +17,14 @@ import java.util.stream.Collectors;
 @RestController
 public class MainController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    private final UserRepository userRepository;
+
+    public MainController(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+    }
 
     @GetMapping(path = "/hello")
     public String hello() {
@@ -42,7 +49,7 @@ public class MainController {
         return "Deleted User " + userId;
     }
 
-    private static UserEntity getUserEntity(CreatedUserDto requestUser) {
+    private UserEntity getUserEntity(CreatedUserDto requestUser) {
         Set<RoleEntity> roles = requestUser.getRoles()
                 .stream()
                 .map(role -> RoleEntity.builder()
@@ -53,7 +60,7 @@ public class MainController {
         UserEntity user = UserEntity.builder()
                 .userName(requestUser.getUserName())
                 .emailUser(requestUser.getEmailUser())
-                .passwordUser(requestUser.getPasswordUser())
+                .passwordUser(passwordEncoder.encode(requestUser.getPasswordUser()))
                 .roles(roles)
                 .build();
         return user;
