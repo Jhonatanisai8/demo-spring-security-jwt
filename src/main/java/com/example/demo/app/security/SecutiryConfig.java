@@ -1,6 +1,7 @@
 package com.example.demo.app.security;
 
 import com.example.demo.app.security.ffilters.JwtAuthenticationFilter;
+import com.example.demo.app.security.ffilters.JwtAuthorizationFilter;
 import com.example.demo.app.security.jwt.JwtUtils;
 import com.example.demo.app.services.UserDetailsServiceIpml;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +25,7 @@ public class SecutiryConfig {
 
     private final UserDetailsServiceIpml userDetailsService;
     private final JwtUtils jwtUtils;
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
 
     @Bean
@@ -43,6 +46,8 @@ public class SecutiryConfig {
                     sesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })
                 .addFilter(jwtAuthenticationFilter)
+                //se ejecuta primero que el jwtAuthorizationFilter
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
