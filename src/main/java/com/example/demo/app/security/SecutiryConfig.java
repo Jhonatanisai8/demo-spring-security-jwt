@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,8 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true) //habilitar las anotaciones para los controlaores
 public class SecutiryConfig {
 
     private final UserDetailsServiceIpml userDetailsService;
@@ -40,6 +43,8 @@ public class SecutiryConfig {
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
                 .authorizeHttpRequests(authorizeRequests -> {
                     authorizeRequests.requestMatchers("/hello").permitAll();
+                    //authorizeRequests.requestMatchers("/accessAdmin").hasRole("ADMIN");
+                    //authorizeRequests.requestMatchers("/accessUser").hasAnyRole("ADMIN", "USER");
                     authorizeRequests.anyRequest().authenticated();
                 })
                 .sessionManagement(sesion -> {
